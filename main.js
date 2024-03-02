@@ -7,9 +7,9 @@ stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild( stats.dom );
 
 // options
-const cw = 600;
-const ch = 600;
-const cols = 200;
+const cw = 500;
+const ch = 500;
+const cols = 250;
 const rows = cols;
 const cell_w = cw/cols;
 const cell_h = ch/rows;
@@ -17,7 +17,7 @@ const cell_h = ch/rows;
 let cells = initArray(cols, rows);
 let particle_interval_id;
 const particle_interval = 100;
-const particle_amount = 40; // amout of particles generated on click, squared e.g. 5 means a 5x5 area
+const particle_amount = 30; // amout of particles generated on click, squared e.g. 5 means a 5x5 area
 let particle_type = "sand";
 
 // holds mouse coordinates in cells of the canvas/array, x:0, y:0 would be top left cell
@@ -31,8 +31,11 @@ canvas.width = cw;
 canvas.height = ch;
 const ctx = canvas.getContext("2d");
 
+let cell_amount = 0;
+
 function draw(){
     stats.begin();
+    cell_amount = 0;
 
     // copy current array to make changes, avoids interference while looping
     const new_frame = prepareNewFrame(cells);
@@ -45,6 +48,7 @@ function draw(){
         for(let row = 0; row < rows; row++){
             const currentCell = cells[col][row];
             if(currentCell === 0) continue;
+            cell_amount++;
             // if(currentCell.falling > 0) continue;
             
             ctx.fillStyle = currentCell.color;
@@ -87,6 +91,8 @@ function draw(){
 
     // update cells array with the new "frame"
     cells = new_frame;
+
+    console.log(cell_amount);
 
     stats.end();
 
