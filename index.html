@@ -5,32 +5,50 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <style>
-        *, *::after, *::before {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-		body {
-			height: 100vh;
-			display: grid;
-			place-items: center;
-			background-color: #1F1F1F;
-			color: whitesmoke;
-		}
-
-		#canvas{
-			border: 1px solid whitesmoke;
-		}
-    </style>
-    <!-- <link rel="stylesheet" href="./style.css"> -->
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+    <div id="choices">
+        <div class="btn sand active" data-type="sand">Sand</div>
+        <div class="btn water" data-type="water">Water</div>
+        <div class="btn grass" data-type="grass">Grass</div>
+        <div class="btn crystal" data-type="crystal">Crystal</div>
+        <div class="btn void" data-type="void">Void</div>
+        <div class="btn void" data-type="static">Static</div>
+    </div>
 	<canvas id="canvas"></canvas>
 
 	<script src="./utils/stats.js"></script>
-    <!-- <script src="./main.js" type="module"></script> -->
-    <script src="./mainold.js" type="module"></script>
+    <script src="./main.js" type="module"></script>
+    <!-- <script src="./main.min.js" type="module"></script> -->
+    <script type="text/javascript">
+        // let radius = 5;
+        // let xm = radius;
+        // let ym = radius;
+        // let xlast = -1;
+        // let ylast = -1;
+        // const circ = [];
+        
+        // for(let i = 0; i < radius*2+1; i++){
+        //     circ[i] = [];
+        //     for(let j = 0; j < radius*2+1; j++){
+        //         circ[i][j] = 0;
+        //     }
+        // }
+
+        // function circle(radius,xm,ym){
+        //     for (let i = 0; i < 720; i++) {
+        //         let x = Math.floor(xm+(radius*Math.sin(i*(Math.PI/180)))+0.5);
+        //         let y = Math.floor(ym+(radius*Math.cos(i*(Math.PI/180)))+0.5);
+        //         if (xlast != x || ylast != y){
+        //             xlast = x;
+        //             ylast = y;
+        //             circ[x][y] = 1;
+        //         }
+        //     }
+        // }
+        // circle(radius,xm,ym);
+        // console.table(circ);
+        </script>
 </body>
 </html>

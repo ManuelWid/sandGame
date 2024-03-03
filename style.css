@@ -1,11 +1,69 @@
+*, *::after, *::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     height: 100vh;
-    display: flex;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     background-color: #1F1F1F;
     color: whitesmoke;
 }
 
 #canvas{
     border: 1px solid whitesmoke;
+}
+
+#choices{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: .2rem .5rem;
+    background-color: #333;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.active {
+    outline: 3px solid whitesmoke;
+    position: relative;
+}
+
+.active::after {
+    content: "";
+    position: absolute;
+    top: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 2px;
+    width: 100%;
+    background-color: whitesmoke;
+    opacity: .5;
+}
+
+.sand {
+    background-color: rgb(243, 210, 138);
+    color: black;
+}
+
+.water {
+    background-color: aquamarine;
+    color: black;
+}
+
+.crystal {
+    background-color: violet;
+    color: black;
+}
+
+.grass {
+    background-color: green;
+    color: white;
 }
