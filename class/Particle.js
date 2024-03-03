@@ -5,6 +5,7 @@ export class Particle {
     color_water = ["#00296ba0", "#003f88a0", "#00509da0"];
     color_crystal = ["#9b5de5", "#f15bb5", "#f08080"];
     color_grass = ["#80b918", "#55a630", "#aacc00"];
+    color_flower = "#ff758f";
     color_hsl = 0; // degree 0-360
     hsl_increment = 0.5;
     bounces = 0; // for fluids

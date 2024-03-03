@@ -8,17 +8,19 @@ document.body.appendChild(stats.dom);
 // options
 const cw = 500;
 const ch = 500;
-const cols = cw / 5;
+const cols = cw / 2;
 const rows = cols;
 const cell_w = cw/cols;
 const cell_h = ch/rows;
 
-const available_rows = [...Array(rows).keys()];
+const available_cols = [...Array(rows).keys()];
 
 const cells = initArray(cols, rows);
 let particle_interval_id;
-const particle_interval = 100;
-const particle_amount = 5; // amout of particles generated on click, squared e.g. 5 means a 5x5 area
+let particle_interval = 50;
+const particle_interval_default = 50;
+const particle_interval_static = 0;
+const particle_amount = 10; // amout of particles generated on click, squared e.g. 5 means a 5x5 area
 let particle_type = "sand";
 let particles_on_screen = 0;
 const fluid_bounces = 500; // how often a fluide goes left right before stopping (resets with gravity)
@@ -26,7 +28,7 @@ const fluid_bounces = 500; // how often a fluide goes left right before stopping
 // holds mouse coordinates in cells of the canvas/array, x:0, y:0 would be top left cell
 const mouse = {x: 0, y: 0};
 
-// cutout (void) circle, only works with particle_amount 5
+// cutout (void) circle
 const circle10 = [
     [0,0,0,1,1,1,1,0,0,0],
     [0,0,1,1,1,1,1,1,0,0],
@@ -59,60 +61,61 @@ function draw(){
     particles_on_screen = 0;
     
     // loop cell array and draw them to canvas (bottom to top)
-    for(let col = cols-1; col >= 0; col--){
-        // remaining rows, needed to randomize current row to minimize direction preference
-        const current_rows = [...available_rows];
-        for(let i = 0; i < rows; i++){
-            let row = ranNum(current_rows);
+    for(let row = rows-1; row >= 0; row--){
+        // remaining cols, needed to randomize current col to minimize direction preference
+        const current_cols = [...available_cols];
+        for(let i = 0; i < cols; i++){
+            // using a random column instead of linear 0 to cols.length, minimizes directional preference
+            let col = ranNum(current_cols);
 
-            const current_cell = cells[row][col];
+            const current_cell = cells[col][row];
 
             if(current_cell === 0) continue;
             particles_on_screen++;
-            const below = cells[row][col+1];
+            const below = cells[col][row+1];
 
             // gravity
             if(below === 0 && current_cell.state !== "static"){
-                cells[row][col+1] = current_cell;
-                cells[row][col] = 0;
+                cells[col][row+1] = current_cell;
+                cells[col][row] = 0;
                 current_cell.bounces = 0;
                 current_cell.direction = 0;
-                ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                 ctx.fillStyle = current_cell.color;
-                ctx.fillRect(row * cell_w, (col+1) * cell_h, cell_w, cell_h);
+                ctx.fillRect(col * cell_w, (row+1) * cell_h, cell_w, cell_h);
                 continue;
             }
             // collision
             else{
-                const bottom_left_empty = cells[row-1] && cells[row-1][col+1] === 0;
-                const bottom_right_empty = cells[row+1] && cells[row+1][col+1] === 0;
+                const bottom_left_empty = cells[col-1] && cells[col-1][row+1] === 0;
+                const bottom_right_empty = cells[col+1] && cells[col+1][row+1] === 0;
                 const bottom_both_empty = bottom_left_empty && bottom_right_empty;
                 switch(current_cell.type){
                     // sand
                     case "sand":
                         if(bottom_both_empty){
                             const sign = Math.random() < 0.5 ? -1 : 1;
-                            cells[row+sign][col+1] = current_cell;
-                            cells[row][col] = 0;
-                            ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                            cells[col+sign][row+1] = current_cell;
+                            cells[col][row] = 0;
+                            ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                             ctx.fillStyle = current_cell.colors;
-                            ctx.fillRect((row+sign) * cell_w, (col+1) * cell_h, cell_w, cell_h);
+                            ctx.fillRect((col+sign) * cell_w, (row+1) * cell_h, cell_w, cell_h);
                             break;
                         }
                         else if(bottom_left_empty){
-                            cells[row-1][col+1] = current_cell;
-                            cells[row][col] = 0;
-                            ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                            cells[col-1][row+1] = current_cell;
+                            cells[col][row] = 0;
+                            ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                             ctx.fillStyle = current_cell.color;
-                            ctx.fillRect((row-1) * cell_w, (col+1) * cell_h, cell_w, cell_h);
+                            ctx.fillRect((col-1) * cell_w, (row+1) * cell_h, cell_w, cell_h);
                             break;
                         }
                         else if(bottom_right_empty){
-                            cells[row+1][col+1] = current_cell;
-                            cells[row][col] = 0;
-                            ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                            cells[col+1][row+1] = current_cell;
+                            cells[col][row] = 0;
+                            ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                             ctx.fillStyle = current_cell.color;
-                            ctx.fillRect((row+1) * cell_w, (col+1) * cell_h, cell_w, cell_h);
+                            ctx.fillRect((col+1) * cell_w, (row+1) * cell_h, cell_w, cell_h);
                             break;
                         }
                         break;
@@ -120,55 +123,55 @@ function draw(){
                     // water
                     case "water":
                         if(current_cell.bounces > fluid_bounces) break;
-                        const left_exist = cells[row-1];
-                        const right_exist = cells[row+1];
-                        const left_empty = left_exist && cells[row-1][col] === 0;
-                        const right_empty = right_exist && cells[row+1][col] === 0;
+                        const left_exist = cells[col-1];
+                        const right_exist = cells[col+1];
+                        const left_empty = left_exist && cells[col-1][row] === 0;
+                        const right_empty = right_exist && cells[col+1][row] === 0;
                         const both_empty = left_empty && right_empty;
                         if((!left_exist || !right_exist)){
-                            cells[row][col] = 0;
-                            ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                            cells[col][row] = 0;
+                            ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                             break;
                         }
                         if(both_empty){
                             if(current_cell.direction === 0){
                                 const sign = Math.random() < 0.5 ? -1 : 1;
                                 current_cell.direction = sign;
-                                cells[row+sign][col] = current_cell;
-                                cells[row][col] = 0;
-                                ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                                cells[col+sign][row] = current_cell;
+                                cells[col][row] = 0;
+                                ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                                 ctx.fillStyle = current_cell.color;
-                                ctx.fillRect((row+sign) * cell_w, col * cell_h, cell_w, cell_h);
+                                ctx.fillRect((col+sign) * cell_w, row * cell_h, cell_w, cell_h);
                                 current_cell.bounces++;
                                 break;
                             }
                             else{
-                                cells[row+current_cell.direction][col] = current_cell;
-                                cells[row][col] = 0;
-                                ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                                cells[col+current_cell.direction][row] = current_cell;
+                                cells[col][row] = 0;
+                                ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                                 ctx.fillStyle = current_cell.color;
-                                ctx.fillRect((row+current_cell.direction) * cell_w, col * cell_h, cell_w, cell_h);
+                                ctx.fillRect((col+current_cell.direction) * cell_w, row * cell_h, cell_w, cell_h);
                                 current_cell.bounces++;
                                 break;
                             }
                         }
                         else if(left_empty){
                             current_cell.direction = -1;
-                            cells[row-1][col] = current_cell;
-                            cells[row][col] = 0;
-                            ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                            cells[col-1][row] = current_cell;
+                            cells[col][row] = 0;
+                            ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                             ctx.fillStyle = current_cell.color;
-                            ctx.fillRect((row-1) * cell_w, col * cell_h, cell_w, cell_h);
+                            ctx.fillRect((col-1) * cell_w, row * cell_h, cell_w, cell_h);
                             current_cell.bounces++;
                             break;
                         }
                         else if(right_empty){
                             current_cell.direction = 1;
-                            cells[row+1][col] = current_cell;
-                            cells[row][col] = 0;
-                            ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                            cells[col+1][row] = current_cell;
+                            cells[col][row] = 0;
+                            ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                             ctx.fillStyle = current_cell.color;
-                            ctx.fillRect((row+1) * cell_w, col * cell_h, cell_w, cell_h);
+                            ctx.fillRect((col+1) * cell_w, row * cell_h, cell_w, cell_h);
                             current_cell.bounces++;
                             break;
                         }
@@ -178,17 +181,22 @@ function draw(){
                     case "grass":
                         if(below && below.state === "solid" && below.transformed === false){
                             for(let i = 1, len = Math.floor(Math.random() * 6); i < len; i++){
-                                const below_i = cells[row][col+i];
+                                const below_i = cells[col][row+i];
                                 if(below_i){
                                     below_i.transform_type = "grass";
                                     below_i.transformed = true;
-                                    ctx.fillStyle = current_cell.randomColor(current_cell.color_grass);
-                                    ctx.fillRect(row * cell_w, (col+i) * cell_h, cell_w, cell_h);
+                                    if(Math.random() < 0.9){
+                                        ctx.fillStyle = current_cell.randomColor(current_cell.color_grass);
+                                    }
+                                    else{
+                                        ctx.fillStyle = current_cell.color_flower;
+                                    }
+                                    ctx.fillRect(col * cell_w, (row+i) * cell_h, cell_w, cell_h);
                                 }
                             }
                         }
-                        cells[row][col] = 0;
-                        ctx.clearRect(row * cell_w, col * cell_h, cell_w, cell_h);
+                        cells[col][row] = 0;
+                        ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                         break;
 
                     // crystal
@@ -213,11 +221,11 @@ function draw(){
 // start the magic
 requestAnimationFrame(draw);
 
-function ranNum(rowArr){
-    // console.log(rowArr);
-    const r = Math.floor(Math.random() * rowArr.length);
-    const res = rowArr[r];
-    rowArr.splice(r, 1);
+function ranNum(colArr){
+    // console.log(colArr);
+    const r = Math.floor(Math.random() * colArr.length);
+    const res = colArr[r];
+    colArr.splice(r, 1);
     return res;
 };
 
@@ -318,5 +326,11 @@ choices.addEventListener("click", (e)=>{
         }
         e.target.classList.add("active");
         particle_type = e.target.dataset.type;
+        if(particle_type === "static"){
+            particle_interval = particle_interval_static;
+        }
+        else{
+            particle_interval = particle_interval_default;
+        }
     }
 })
