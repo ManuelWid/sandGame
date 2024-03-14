@@ -5,17 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div id="choices">
-        <div class="btn sand active" data-type="sand">Sand</div>
+    <div id="particles">
+        <div class="btn sand active-bottom" data-type="sand">Sand</div>
         <div class="btn water" data-type="water">Water</div>
         <div class="btn grass" data-type="grass">Grass</div>
         <div class="btn crystal" data-type="crystal">Crystal</div>
+        <div class="btn crystal" data-type="hsl">HSL</div>
         <div class="btn void" data-type="void">Void</div>
         <div class="btn void" data-type="static">Static</div>
     </div>
+
+    <div id="templates">
+        <div class="btn active-top" data-template="empty">Empty</div>
+        <div class="btn" data-template="pachinko">Pachinko</div>
+    </div>
+
 	<canvas id="canvas"></canvas>
 
 	<script src="./utils/stats.js"></script>

@@ -9,19 +9,18 @@ document.body.appendChild(stats.dom);
 // options
 const cw = 500;
 const ch = 500;
-const cols = cw / 4;
+const cols = cw / 2;
 const rows = cols;
 const cell_w = cw/cols;
 const cell_h = ch/rows;
 
-const available_cols = [...Array(cols).keys()];
-const available_rows = [...Array(rows).keys()];
+const available_cols = [...Array(rows).keys()];
 
 let particle_interval_id;
 let particle_interval = 50;
 const particle_interval_default = 50;
 const particle_interval_static = 0;
-const particle_amount = 5; // amout of particles generated on click, squared e.g. 5 means a 5x5 area
+const particle_amount = 10; // amout of particles generated on click, squared e.g. 5 means a 5x5 area
 let particle_type = "sand";
 let particles_on_screen = 0;
 const fluid_bounces = 500; // how often a fluide goes left right before stopping (resets with gravity)
@@ -41,16 +40,14 @@ function draw(){
     stats.begin();
 
     particles_on_screen = 0;
-
-    const current_cols = [...available_cols];
     
-    // loop cell array and draw them to canvas (random order)
-    for(let i = 0; i < cols; i++){
-        const current_rows = [...available_rows];
-        // using a random column instead of linear 0 to cols.length, minimizes directional preference
-        let col = ranNum(current_cols);
-        for(let j = 0; j < rows; j++){
-            let row = ranNum(current_rows);
+    // loop cell array and draw them to canvas (bottom to top)
+    for(let row = rows-1; row >= 0; row--){
+        // remaining cols, needed to randomize current col to minimize direction preference
+        const current_cols = [...available_cols];
+        for(let i = 0; i < cols; i++){
+            // using a random column instead of linear 0 to cols.length, minimizes directional preference
+            let col = ranNum(current_cols);
 
             const current_cell = cells[col][row];
 
@@ -166,7 +163,7 @@ function draw(){
                             }
                         }
                         break;
-
+    
                     // water
                     case "water":
                         // convert sand to wet sand/mud
@@ -232,7 +229,7 @@ function draw(){
                             current_cell.bounces++;
                         }
                         break;
-
+    
                     // grass
                     case "grass":
                         if(below && below.state === "solid" && below.transform_type !== "grass"){
@@ -254,18 +251,17 @@ function draw(){
                         cells[col][row] = 0;
                         ctx.clearRect(col * cell_w, row * cell_h, cell_w, cell_h);
                         break;
-
+    
                     // crystal
                     case "crystal":
                         break;
-
+    
                     default:
                         break;
                 }
             }
         }
     }
-    
     // console.log(particles_on_screen);
 
     stats.end();
