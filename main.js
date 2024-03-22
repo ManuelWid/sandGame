@@ -1,9 +1,8 @@
 import { Particle } from "./class/Particle.js";
 import { circle5, circle10 } from "./utils/shapes.js";
-import { checkWater } from "./phsyics/water.js";
 
 // FPS display
-var stats = new Stats();
+var stats = new Stats(0,0);
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 
@@ -52,19 +51,10 @@ function draw(){
     stats.begin();
 
     particles_on_screen = 0;
-    // let current_cols;
-
-    // if(frame % 2 === 0){
-    //     current_cols = [...available_cols.slice(0, available_cols.length/2)];
-    // }
-    // else{
-    //     current_cols = [...available_cols.slice(available_cols.length/2)];
-    // }
 
     const current_cols = [...available_cols];
     
     // loop cell array and draw them to canvas (random order)
-    // for(let i = 0; i < Math.floor(cols/2); i++){
     for(let i = 0; i < cols; i++){
         const current_rows = [...available_rows];
         // using a random column instead of linear 0 to cols.length, minimizes directional preference
