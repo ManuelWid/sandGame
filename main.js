@@ -9,7 +9,7 @@ document.body.appendChild(stats.dom);
 // options
 const cw = 500;
 const ch = 500;
-const cols = cw / 4;
+const cols = cw / 2;
 const rows = cols;
 const cell_w = cw/cols;
 const cell_h = ch/rows;
@@ -21,7 +21,7 @@ let particle_interval_id;
 let particle_interval = 50;
 const particle_interval_default = 50;
 const particle_interval_static = 0;
-const particle_amount = 5; // amout of particles generated on click, squared e.g. 5 means a ~5x5 area
+const particle_amount = 10; // amout of particles generated on click, squared e.g. 5 means a ~5x5 area
 let particle_type = "sand";
 let particles_on_screen = 0;
 const fluid_bounces = 200; // how often a fluide goes left right before stopping (resets with gravity)
